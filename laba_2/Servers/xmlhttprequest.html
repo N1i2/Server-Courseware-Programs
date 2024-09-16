@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMLHttpRequest</title>
+    <script>
+        function loadName() {
+            const xhr = new XMLHttpRequest();
+            
+            xhr.open('GET', 'http://localhost:5003/api/name', true);
+            
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const person = JSON.parse(xhr.responseText);
+                    document.getElementById('lastName').innerText = person.lastName;
+                    document.getElementById('firstName').innerText = person.firstName;
+                    document.getElementById('patronymic').innerText = person.patronymic;
+                } else {
+                    console.error('Error: ' + xhr.status);
+                }
+            };
+
+            xhr.onerror = function () {
+                console.error('Request failed');
+            };
+
+            xhr.send();
+        }
+    </script>
+</head>
+<body>
+    <h1>Name</h1>
+    <button onclick="loadName()">Show Name</button>
+
+    <div>
+        <p>Last name: <span id="lastName"></span></p>
+        <p>First name: <span id="firstName"></span></p>
+        <p>Patronymic: <span id="patronymic"></span></p>
+    </div>
+
+</body>
+</html>

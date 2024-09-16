@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#loadData').click(function() {
+                $.ajax({
+                    url: 'http://localhost:5005/api/name',
+                    method: 'GET',
+                    success: function(data) {
+                        $('#lastName').text(data.lastName);
+                        $('#firstName').text(data.firstName);
+                        $('#patronymic').text(data.patronymic);
+                    },
+                    error: function() {
+                        console.error('Error');
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>jQuery</h1>
+
+    <button id="loadData">Show info</button>
+
+    <div>
+        <p>Last name: <span id="lastName"></span></p>
+        <p>First name: <span id="firstName"></span></p>
+        <p>Patronymic: <span id="patronymic"></span></p>
+    </div>
+</body>
+</html>
