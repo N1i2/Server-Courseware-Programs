@@ -1,5 +1,5 @@
 @echo off
 
-cd Servers
+cd ../Servers
 
 node server_1.js
