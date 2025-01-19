@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="form" action="/send" method="post">
+        <input id="emailFrom" type="email" name="from" placeholder="From Email" required>
+        <input id="password" type="password" name="password" placeholder="password" required>
+        <input id="emailTo" type="email" name="to" placeholder="To Email" required>
+        <textarea id="message" name="message" placeholder="Message" required></textarea>
+        <button type="submit">Send Email</button>
+    </form>
+</body>
+<script>
+    document.getElementById('form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const emailFrom = document.getElementById('emailFrom').value;
+        const password = document.getElementById('password').value;
+        const emailTo = document.getElementById('emailTo').value;
+        const message = document.getElementById('message').value;
+
+        await fetch('/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                emailFrom: emailFrom,
+                password: password,
+                emailTo: emailTo,
+                message: message
+            })
+        });
+    })
+</script>
+
+</html>

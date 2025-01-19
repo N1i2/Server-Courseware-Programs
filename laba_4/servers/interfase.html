@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laba 4</title>
+
+    <style>
+        #AllData {
+            border: 1px, solid, black;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Select -->
+    <div id="error"></div>
+    <div id="AllData"></div>
+    <button onclick="select()">Get</button>
+
+    <br />
+    <div>
+        <!-- Insert -->
+        <br>
+        <div class='row'>
+            <label for="IdPost">ID ========= </label>
+            <input type="number" id="IdPost" min="0" required />
+        </div>
+        <div class='row'>
+            <label for="NamePost">Name ======= </label>
+            <input type="text" id="NamePost" required />
+        </div>
+        <div class='row'>
+            <label for="BdayPost">Birthday ===== </label>
+            <input type="date" id="BdayPost" required />
+        </div>
+        <div class='row'>
+            <button onclick="insert()">Add</button>
+        </div>
+        <!-- Update -->
+        <br>
+        <div class='row'>
+            <label for="IdPut">ID ========= </label>
+            <input type="number" id="IdPut" min="0" required onchange="getElemById(0)" />
+        </div>
+        <div class='row'>
+            <label for="NamePut">Name ======= </label>
+            <input type="text" id="NamePut" required />
+        </div>
+        <div class='row'>
+            <label for="BdayPut">Birthday ===== </label>
+            <input type="date" id="BdayPut" required />
+        </div>
+        <div class='row'>
+            <button onclick="update()">Update</button>
+        </div>
+        <!-- Delete -->
+        <br>
+        <div class='row'>
+            <label for="IdDelete">ID ========= </label>
+            <input type="number" id="IdDelete" min="0" required onchange="getElemById(1)" />
+        </div>
+        <div class='row'>
+            <label for="NameDelete">Name ======= </label>
+            <input type="text" id="NameDelete" readonly />
+        </div>
+        <div class='row'>
+            <label for="BdayDelete">Birthday ===== </label>
+            <input type="date" id="BdayDelete" readonly />
+        </div>
+        <div class='row'>
+            <button onclick="remove()">Delete</button>
+        </div>
+    </div>
+
+    <script>
+        const select = () => {
+            fetch("/api/db", { method: "GET", headers: { 'Accept': 'application/json' } })
+                .then(response => response.json())
+                .then(data => {
+                    AllData.innerHTML = '';
+                    data.forEach(el => AllData.innerHTML += `${el.id}) ${el.name}: ${el.bday}<br>`);
+                })
+        }
+        const insert = () => {
+            error.innerHTML = "";
+            fetch("/api/db", {
+                method: "POST",
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', },
+                body: JSON.stringify({
+                    id: IdPost.value,
+                    name: NamePost.value,
+                    bday: checkDate(BdayPost.value),
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.error) {
+                        error.innerHTML = data.error;
+                    }
+                    IdPost.value = "";
+                    NamePost.value = "";
+                    BdayPost.value = "";
+                    select();
+                });
+        }
+        const update = () => {
+            error.innerHTML = "";
+            fetch("/api/db", {
+                method: "PUT",
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', },
+                body: JSON.stringify({
+                    id: IdPut.value,
+                    name: NamePut.value,
+                    bday: checkDate(BdayPut.value),
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    if (data.error) {
+                        error.innerHTML = data.error;
+                    }
+                    IdPut.value = "";
+                    NamePut.value = "";
+                    BdayPut.value = "";
+                    select();
+                })
+        };
+        const remove = () => {
+            error.innerHTML = "";
+            fetch("/api/db", {
+                method: "DELETE",
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', },
+                body: JSON.stringify({
+                    id: IdDelete.value,
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    if (data.error) {
+                        error.innerHTML = data.error;
+                    }
+                    IdDelete.value = "";
+                    NameDelete.value = "";
+                    BdayDelete.value = "";
+                    select();
+                })
+        };
+
+        let checkDate = (date) => {
+            let pattern = /(\d{4})\-(\d{2})\-(\d{2})/;
+            return date.replace(pattern, '$3-$2-$1');
+        }
+
+        const getElemById = async (index) => {
+            let elem = await fetch("/api/db", { method: "GET", headers: { 'Accept': 'application/json' }, mode: "no-cors" })
+                .then(response => response.json());
+
+            let current_person = null;
+            for (let el of elem) {
+                if(index === 0){
+                    if (el.id == IdPut.value) {
+                        current_person = el;
+                        break;
+                    }
+                }
+                else if(index === 1){
+                    if (el.id == IdDelete.value) {
+                        current_person = el;
+                        break;
+                    }
+                }
+                else{
+                    console.log("fail work index");
+                    return;
+                }
+            }
+
+            if (current_person !== null) {
+                if (index === 0) {
+                    GetUpdate(current_person);
+                }
+                else if (index === 1) {
+                    GetDelete(current_person);
+                }
+            } else {
+                if (index === 0) {
+                    ClearUpdate();
+                }
+                else if (index === 1) {
+                    ClearDelete();
+                }
+            }
+        };
+        const GetUpdate = (current_person) => {
+            NamePut.value = current_person.name;
+            let pattern = /(\d{2})\-(\d{2})\-(\d{4})/;
+            BdayPut.value = current_person.bday.replace(pattern, '$3-$2-$1');
+        }
+        const GetDelete = (current_person) => {
+            NameDelete.value = current_person.name;
+            let pattern = /(\d{2})\-(\d{2})\-(\d{4})/;
+            BdayDelete.value = current_person.bday.replace(pattern, '$3-$2-$1');
+        }
+        const ClearUpdate = () => {
+            error.innerHTML = "This Id is empty";
+            IdPut.value = "";
+            NamePut.value = "";
+            BdayPut.value = "";
+        }
+        const ClearDelete = () => {
+            error.innerHTML = "This Id is empty";
+            IdDelete.value = "";
+            NameDelete.value = "";
+            BdayDelete.value = "";
+        }
+    </script>
+</body>
+
+</html>

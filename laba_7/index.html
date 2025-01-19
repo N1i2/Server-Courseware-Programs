@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Static File Server Test</title>
+    <link rel="stylesheet" href="/some.css">
+    <script src="/some.js" defer></script>
+</head>
+<body>
+    <h1>Static File Server Test</h1>
+    <img src="/girl.png" alt="Test Image">
+    <video controls width="320">
+        <source src="/some.mp4" type="video/mp4">
+        vidio failed in this browser
+    </video>
+    <a href="/some.docx" download>Download DOCX</a>
+    
+    <div class="contaner">
+        <div class="jsonContent" id="jsonContent"></div>
+        <div class="xmlContent" id="xmlContent"></div>
+    </div>
+    <script>
+        fetch('/some.json')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('jsonContent').textContent = JSON.stringify(data, null, 2);
+            });
+
+        fetch('/some.xml')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('xmlContent').textContent = data;
+            });
+    </script>
+</body>
+</html>
